@@ -1,0 +1,117 @@
+{
+  "connectors": {
+    "type": "const",
+    "value": [
+      {
+        "id": "http",
+        "name": "fastify-connector",
+        "exposedPort": 4000,
+        "enabled": true,
+        "settings": {
+          "listenAddr": "::",
+          "listenPort": 4000,
+          "bodyLimit": 1048576,
+          "underPressureOptions": {
+            "message": "Service Unavailable",
+            "retryAfter": 10,
+            "healthCheckInterval": -1,
+            "sampleInterval": 5
+          },
+          "multipartLimits": {
+            "fieldNameSize": 100,
+            "fieldSize": 1048576,
+            "headerPairs": 2000
+          },
+          "octetStreamSizeLimit": 5242880
+        }
+      },
+      {
+        "id": "superagent-default",
+        "name": "superagent-connector",
+        "settings": {
+          "disableTLS": true
+        }
+      }
+    ]
+  },
+  "loaders": [],
+  "context": {},
+  "core": {
+    "disableTLS": true,
+    "debugPort": 4004,
+    "debugMode": false,
+    "policies": {
+      "Common Policies": [
+        "./node_modules/@platformeco/superagent-connector/dist/*",
+        "./node_modules/@platformeco/fastify-connector/dist/*",
+        "./node_modules/@platformeco/jdbc-connector/dist/*",
+        "./node_modules/@platformeco/kafka-connector/dist/*",
+        "./node_modules/@platformeco/jsonschema-policy/*",
+        "./node_modules/@platformeco/settags-policy/*",
+        "./node_modules/@platformeco/jsontobuffer-policy/*",
+        "./node_modules/@platformeco/buffertostring-policy/*",
+        "./node_modules/@platformeco/buffertojson-policy/*",
+        "./node_modules/@platformeco/xmltojson-policy/*",
+        "./node_modules/@platformeco/jwt-policies/src/*",
+        "./node_modules/@platformeco/setlogs-policy/*",
+        "./node_modules/@platformeco/crypto-policy/*",
+        "./node_modules/@platformeco/delay-policy/*",
+        "./node_modules/@platformeco/csvtojson-policy/*",
+        "./node_modules/@platformeco/jsontocsv-policy/*",
+        "./node_modules/@platformeco/date-policies/*",
+        "./node_modules/@platformeco/array-policies/*",
+        "./node_modules/@platformeco/zip-policies/dist/*"
+      ],
+      "Custom Policies": [
+        "./custom_policies/*"
+      ]
+    },
+    "definitions": [
+      "./definitions/**"
+    ],
+    "sharedFlows": {
+      "Custom Flows": [
+        "./shared_flows/**"
+      ]
+    },
+    "connectors": [
+      "./node_modules/@platformeco/fastify-connector/dist",
+      "./node_modules/@platformeco/superagent-connector/dist",
+      "./node_modules/@platformeco/kafka-connector/dist",
+      "./node_modules/@platformeco/jdbc-connector/dist"
+    ],
+    "loaders": [
+      "./node_modules/@platformeco/vault-loader/src"
+    ]
+  },
+  "telemetry": {
+    "enabled": true,
+    "tracing": {
+      "transport": "nats-s",
+      "tracerName": "intgold",
+      "http": {
+        "endpoint": "http://localhost:14268/api/traces"
+      },
+      "nats-s": {
+        "config": {
+          "clusterId": "stan-cluster",
+          "clientId": "ch-core-mgw",
+          "server": "nats://nats-streaming:4222",
+          "queueGroup": "orchestrator",
+          "subject": "spans"
+        },
+        "sendCallback": false,
+        "clientIdPrefix": "core_",
+        "maxPubAcksInflight": 50,
+        "initialReconnectTimeout": 2000
+      }
+    }
+  },
+  "logger": {
+    "enabled": true,
+    "settings": {
+      "level": "error"
+    }
+  },
+  "docker_registry": "docker-apim.apps.lmru.tech/crp1h13be5pn9egrno6m/apiplatform/core"
+}

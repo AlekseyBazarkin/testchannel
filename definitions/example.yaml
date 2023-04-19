@@ -1,0 +1,98 @@
+info:
+  name: test
+  title: test
+  description: test
+  version: 1.0.0
+connector:
+  id: http
+  resource:
+    path: /test
+    method: GET
+    querySchema: |-
+      {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "testparam": {
+            "type": "string"
+          }
+        }
+      }
+  tracing:
+    enabled: true
+    req:
+      body: true
+      headers: true
+    res:
+      body: true
+      headers: true
+  tagHeaders:
+    - x-request-id
+  skipParsing: false
+flow:
+  execute:
+    - switch:
+        id: 0a5605c2-3157-4a64-a6a5-6e982f8edb7d
+        title: Check test param
+        case:
+          - execute:
+              - http-request:
+                  id: a7cb9550-7b62-11ea-b6e2-471a1ffcf94f
+                  title: '[HTTP request] request to httpBin'
+                  description: '[HTTP request to some service]'
+                  proceed-on-error: false
+                  configurationType: UI
+                  url: 'https://httpbin.org/anything'
+                  method: GET
+                  responseTimeout: 15000
+                  deadline: 60000
+                  output: httpRequestResult
+                  maxRedirects: 5
+                  agent: KeepAlive
+                  query:
+                    - key: test
+                      value: '${request.query.testparam}'
+              - setResponse:
+                  id: 8acbdc72-d400-4c7f-83f9-060a82b73e33
+                  title: '[Set Response]'
+                  description: '[Set response status, headers and body]'
+                  terminateFlow: false
+                  status: '200'
+                  body: >-
+                    { message: 'hello world!',
+
+                    'httpBin.org call result is':
+                    ${JSON.stringify(httpRequestResult.body)}
+
+                    }
+            title: null
+            condition: request.query.testparam != null;
+          - otherwise:
+              - raiseError:
+                  id: b4d87e77-3454-4a83-a3d5-0400064602a6
+                  title: '[Raise Error]'
+                  description: '[Terminate flow with error]'
+                  configurationType: UI
+                  message: there is no testparam param in query
+                  status: '503'
+tags: []
+documentation:
+  swagger: '2.0'
+  paths:
+    /test:
+      get:
+        parameters:
+          - name: testparam
+            in: query
+            required: false
+            type: string
+        responses:
+          '200':
+            description: success result
+            schema:
+              type: string
+          '500':
+            description: error
+            schema:
+              type: string
+id: da9ddd4a-6dfb-4993-90d2-2a4b383c0c68

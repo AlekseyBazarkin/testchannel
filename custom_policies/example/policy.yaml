@@ -1,0 +1,16 @@
+info:
+  title: example
+  name: example
+  version: 1.0.0
+  description: Example policy
+  contact:
+    name: LM Russia
+    url: www.leroymerlin.ru
+    email: info@leroymerlin.ru
+properties:
+  type: object
+  properties:
+    title:
+      type: string
+    description:
+      type: string
